@@ -11,7 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity, ProviderTypeEntity, AccountEntity]),
+    // TypeOrmModule.forFeature([UserEntity, ProviderTypeEntity, AccountEntity]),
     EntityModule,
   ],
   providers: [AuthResolver, AuthService],

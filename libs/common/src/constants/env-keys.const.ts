@@ -1,0 +1,17 @@
+export const ENV_DATABASE_HOST = 'DATABASE_HOST';
+export const ENV_DATABASE_USER = 'DATABASE_USER';
+export const ENV_DATABASE_PASSWORD = 'DATABASE_PASSWORD';
+export const ENV_DATABASE_NAME = 'DATABASE_NAME';
+
+export const ENV_COOKIE_SECRET = 'COOKIE_SECRET';
+export const ENV_DOMAIN = 'DOMAIN';
+
+export const ENV_SERVER_PORT = 'SERVER_PORT';
+export const ENV_FRONT_URL = 'FRONT_URL';
+
+export const ENV_REDIS_HOST = 'REDIS_HOST';
+export const ENV_REDIS_PORT = 'REDIS_PORT';
+export const ENV_REDIS_PASSWORD = 'REDIS_PASSWORD';
+
+export const ENV_JWT_SECRET = 'JWT_SECRET';
+export const ENV_JWT_EXPIRES_IN = 'JWT_EXPIRES_IN';

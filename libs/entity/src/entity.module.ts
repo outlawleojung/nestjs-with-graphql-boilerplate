@@ -26,7 +26,7 @@ import { UserEntity } from '@lib/entity/entities/user.entity';
       password: process.env[ENV_DATABASE_PASSWORD],
       database: process.env[ENV_DATABASE_NAME],
       // entities: [AccountEntity, ProviderTypeEntity, UserEntity],
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      entities: [UserEntity, AccountEntity, ProviderTypeEntity],
       synchronize: process.env.NODE_ENV !== 'production',
       logging: true,
       namingStrategy: new SnakeNamingStrategy(),

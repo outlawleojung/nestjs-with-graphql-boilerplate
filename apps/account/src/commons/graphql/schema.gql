@@ -1,0 +1,50 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type ProviderTypeDto {
+  id: Int!
+  name: String!
+}
+
+type AccountDto {
+  id: Int!
+  email: String!
+  providerType: ProviderTypeDto!
+}
+
+type UserDto {
+  id: String!
+  name: String!
+  accounts: [AccountDto!]!
+}
+
+type CreateUserOutput {
+  """AccessToken"""
+  accessToken: String!
+
+  """RefreshToken"""
+  refreshToken: String
+}
+
+type Query {
+  getUser(id: String, providerTypeId: Int): UserDto
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): CreateUserOutput!
+}
+
+input CreateUserInput {
+  """Email"""
+  email: String!
+
+  """Password"""
+  password: String
+
+  """Name"""
+  name: String!
+
+  """ProviderTypeId"""
+  providerTypeId: Int!
+}

@@ -19,7 +19,7 @@ type UserDto {
   accounts: [AccountDto!]!
 }
 
-type CreateUserOutput {
+type LoginOutput {
   """AccessToken"""
   accessToken: String!
 
@@ -32,7 +32,8 @@ type Query {
 }
 
 type Mutation {
-  createUser(createUserInput: CreateUserInput!): CreateUserOutput!
+  createUser(createUserInput: CreateUserInput!): LoginOutput!
+  login(loginWithEmailPasswordInput: LoginWithEmailPasswordInput!): LoginOutput!
 }
 
 input CreateUserInput {
@@ -47,4 +48,12 @@ input CreateUserInput {
 
   """ProviderTypeId"""
   providerTypeId: Int!
+}
+
+input LoginWithEmailPasswordInput {
+  """Email"""
+  email: String!
+
+  """Password"""
+  password: String
 }

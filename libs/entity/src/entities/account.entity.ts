@@ -10,6 +10,7 @@ import { UserEntity } from './user.entity';
 import { ProviderTypeEntity } from './provider-type.entity';
 import { BaseModelEntity } from '@lib/entity/entities/base-model.entity';
 
+@Unique(['email'])
 @Unique(['user', 'providerType'])
 @Entity('account')
 export class AccountEntity extends BaseModelEntity {

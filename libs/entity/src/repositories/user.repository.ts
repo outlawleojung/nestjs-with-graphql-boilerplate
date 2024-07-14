@@ -60,26 +60,64 @@ export class UserEntityRepository extends BaseRepository<UserEntity> {
     });
   }
 
+  async findByEmail(email: string) {
+    return await this.repository.findOne({
+      where: {
+        accounts: {
+          email,
+        },
+      },
+      relations: ['accounts', 'accounts.providerType'],
+      select: {
+        id: true,
+        name: true,
+        accounts: {
+          id: true,
+          email: true,
+          providerType: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findByEmailAndProviderType(
+    email: string,
+    providerTypeId: number,
+    qr?: QueryRunner,
+  ) {
+    return await this.getRepository(qr).findOne({
+      where: {
+        accounts: {
+          email,
+          providerTypeId,
+        },
+      },
+      relations: ['accounts', 'accounts.providerType'],
+      select: {
+        id: true,
+        name: true,
+        accounts: {
+          id: true,
+          email: true,
+          providerType: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
+
   async createUser(data: CreateUserInput, qr: QueryRunner) {
     const user = new UserEntity();
     user.name = data.name;
 
     await this.getRepository(qr).save(user);
 
-    const account = new AccountEntity();
-    account.userId = user.id;
-    account.password = data.password;
-    account.providerTypeId = data.providerTypeId;
-    account.email = data.email;
-
-    await this.accountRepository.createAccount(
-      {
-        userId: user.id,
-        providerTypeId: data.providerTypeId,
-        password: data.password,
-      },
-      qr,
-    );
+    return user;
   }
 
   async updateUser(id: string, updates: Partial<UserEntity>, qr?: QueryRunner) {

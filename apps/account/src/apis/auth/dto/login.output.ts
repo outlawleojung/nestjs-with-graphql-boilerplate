@@ -1,7 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class CreateUserOutput {
+export class LoginOutput {
   @Field(() => String, { description: 'AccessToken' })
   accessToken: string;
 

@@ -9,12 +9,13 @@ export class AccountEntityRepository extends BaseRepository<AccountEntity> {
     @InjectRepository(AccountEntity)
     private accountRepository: Repository<AccountEntity>,
   ) {
-    super(accountRepository, UserEntity);
+    super(accountRepository, AccountEntity);
   }
 
   async createAccount(
     data: {
       userId: string;
+      email: string;
       providerTypeId: number;
       password?: string;
     },
@@ -23,6 +24,7 @@ export class AccountEntityRepository extends BaseRepository<AccountEntity> {
     const account = new AccountEntity();
     account.userId = data.userId;
     account.password = data.password;
+    account.email = data.email;
     account.providerTypeId = data.providerTypeId;
 
     await this.getRepository(qr).save(account);

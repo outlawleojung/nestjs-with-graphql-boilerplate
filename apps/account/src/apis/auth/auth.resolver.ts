@@ -7,7 +7,8 @@ import { CreateUserInput } from './dto/create-user.input';
 import { UseInterceptors } from '@nestjs/common';
 import { QueryRunner, TransactionInterceptor } from '@lib/common';
 import { QueryRunner as QR } from 'typeorm';
-import { CreateUserOutput } from './dto/create-user.output';
+import { LoginOutput } from './dto/login.output';
+import { LoginWithEmailPasswordInput } from './dto/login-with-email-password.input';
 
 // @Resolver(() => Auth)
 @Resolver()
@@ -29,12 +30,25 @@ export class AuthResolver {
   }
 
   @UseInterceptors(TransactionInterceptor)
-  @Mutation(() => CreateUserOutput)
+  @Mutation(() => LoginOutput)
   createUser(
     @QueryRunner() queryRunner: QR,
     @Args('createUserInput') createUserInput: CreateUserInput,
   ) {
     return this.authService.create(createUserInput, queryRunner);
+  }
+
+  @UseInterceptors(TransactionInterceptor)
+  @Mutation(() => LoginOutput)
+  login(
+    @QueryRunner() queryRunner: QR,
+    @Args('loginWithEmailPasswordInput')
+    loginWithEmailPasswordInput: LoginWithEmailPasswordInput,
+  ) {
+    return this.authService.loginWithEmailPassword(
+      loginWithEmailPasswordInput,
+      queryRunner,
+    );
   }
 
   // @Mutation(() => Auth)

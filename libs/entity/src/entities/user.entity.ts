@@ -7,8 +7,8 @@ export class UserEntity extends UUIDBaseModelEntity {
   @Column()
   name: string;
 
-  @Column()
-  refreshToken: string;
+  @Column({ nullable: true })
+  refreshToken?: string;
 
   @OneToMany(() => AccountEntity, (account) => account.user)
   accounts: AccountEntity[];

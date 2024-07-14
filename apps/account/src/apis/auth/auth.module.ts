@@ -10,6 +10,7 @@ import {
   UserEntityRepository,
 } from '@lib/entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TokenService } from '@lib/common';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   providers: [
     AuthResolver,
     AuthService,
+    TokenService,
     UserEntityRepository,
     AccountEntityRepository,
   ],

@@ -9,7 +9,6 @@ import { QueryRunner as QR } from 'typeorm';
 import { LoginOutput } from './dto/login.output';
 import { LoginWithEmailInput } from './dto/login-with-email.input';
 
-// @Resolver(() => Auth)
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}

@@ -16,6 +16,7 @@ import { ENV_HASH_ROUNDS_KEY, TokenService } from '@lib/common';
 import { ConfigService } from '@nestjs/config';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { PROVIDER_TYPE } from '@lib/common/constants/constants';
+import { LoginOutput } from './dto/login.output';
 
 @Injectable()
 export class AuthService {
@@ -27,22 +28,6 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly tokenService: TokenService,
   ) {}
-
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthInput: UpdateAuthInput) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
 
   async findById(id: string) {
     const user = await this.userRepository.findById(id);
@@ -138,7 +123,7 @@ export class AuthService {
     return this.loginUser(newUser);
   };
 
-  async loginUser(user: LoginAuthDto) {
+  async loginUser(user: LoginAuthDto): Promise<LoginOutput> {
     return {
       accessToken: this.tokenService.signToken(user, false),
       refreshToken: this.tokenService.signToken(user, true),

@@ -19,7 +19,7 @@ export class AccountEntityRepository extends BaseRepository<AccountEntity> {
       providerTypeId: number;
       password?: string;
     },
-    qr: QueryRunner,
+    queryRunner: QueryRunner,
   ) {
     const account = new AccountEntity();
     account.userId = data.userId;
@@ -27,6 +27,6 @@ export class AccountEntityRepository extends BaseRepository<AccountEntity> {
     account.email = data.email;
     account.providerTypeId = data.providerTypeId;
 
-    await this.getRepository(qr).save(account);
+    return await this.getRepository(queryRunner).save(account);
   }
 }

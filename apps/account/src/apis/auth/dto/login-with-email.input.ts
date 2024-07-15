@@ -1,7 +1,7 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
 
 @InputType()
-export class LoginWithEmailPasswordInput {
+export class LoginWithEmailInput {
   @Field(() => String, { description: 'Email' })
   email: string;
 

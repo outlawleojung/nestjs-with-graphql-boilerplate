@@ -10,10 +10,12 @@ import { ProviderTypeDto } from './dto/provider-type.dto';
 import { AccountDto } from './dto/account.dto';
 import { CreateUserInput } from './dto/create-user.input';
 import { QueryRunner } from 'typeorm';
-import bcryptjs from 'bcryptjs';
-import { LoginWithEmailPasswordInput } from './dto/login-with-email-password.input';
+import * as bcrypt from 'bcrypt';
+import { LoginWithEmailInput } from './dto/login-with-email.input';
 import { ENV_HASH_ROUNDS_KEY, TokenService } from '@lib/common';
 import { ConfigService } from '@nestjs/config';
+import { LoginAuthDto } from './dto/login-auth.dto';
+import { PROVIDER_TYPE } from '@lib/common/constants/constants';
 
 @Injectable()
 export class AuthService {
@@ -58,55 +60,10 @@ export class AuthService {
     return this.toUserDto(user);
   }
 
-  async create(createUserInput: CreateUserInput, queryRunner: QueryRunner) {
-    const user = await this.userRepository.createUser(
-      createUserInput,
-      queryRunner,
-    );
+  async loginWithEmail(input: LoginWithEmailInput, queryRunner: QueryRunner) {
+    const exUser = await this.authenticateWithEmailAndPassword(input);
 
-    await this.accountRepository.createAccount(
-      {
-        userId: user.id,
-        email: createUserInput.email,
-        providerTypeId: createUserInput.providerTypeId,
-        password: createUserInput.password,
-      },
-      queryRunner,
-    );
-
-    return await this.loginWithEmail(
-      createUserInput.email,
-      createUserInput.password,
-      queryRunner,
-    );
-  }
-
-  async loginWithEmailPassword(
-    input: LoginWithEmailPasswordInput,
-    queryRunner: QueryRunner,
-  ) {
-    const exUser = await this.userRepository.findByEmailAndProviderType(
-      input.email,
-      1,
-    );
-
-    if (!exUser) {
-      this.logger.error('패사용자를 찾을 수 없음');
-      throw new Error('사용자를 찾을 수 없음');
-    }
-
-    const validPassword = bcryptjs.compareSync(
-      input.password,
-      exUser.accounts[0].password,
-    );
-
-    if (!validPassword) {
-      this.logger.error('패스워드가 일치 하지 않음');
-      throw new Error('패스워드가 일치 하지 않음');
-    }
-
-    const newUser = await this.userRepository.findById(exUser.id);
-    return newUser;
+    return this.loginUser(exUser);
   }
 
   async validateUser(accessToken: string) {
@@ -120,24 +77,19 @@ export class AuthService {
     }
   }
 
-  async authenticatedWithEmailAndPassword(
-    email: string,
-    password: string,
-    qr?: QueryRunner,
-  ) {
+  async authenticateWithEmailAndPassword(user: LoginWithEmailInput) {
     const exUser = await this.userRepository.findByEmailAndProviderType(
-      email,
-      1,
-      qr,
+      user.email,
+      PROVIDER_TYPE.LOCAL,
     );
 
     if (!exUser) {
-      this.logger.error('패사용자를 찾을 수 없음');
+      this.logger.error('사용자를 찾을 수 없음');
       throw new Error('사용자를 찾을 수 없음');
     }
 
-    const validPassword = bcryptjs.compareSync(
-      password,
+    const validPassword = bcrypt.compareSync(
+      user.password,
       exUser.accounts[0].password,
     );
 
@@ -146,38 +98,47 @@ export class AuthService {
       throw new Error('패스워드가 일치 하지 않음');
     }
 
-    const newUser = await this.userRepository.findById(exUser.id);
-    return newUser;
+    return { id: exUser.id, name: exUser.name, email: user.email };
   }
 
-  async loginWithEmail(email: string, password: string, qr?: QueryRunner) {
-    const existingUser = await this.authenticatedWithEmailAndPassword(
-      email,
-      password,
-      qr,
-    );
-
-    return this.loginUser(existingUser);
-  }
-
-  registerWithEmail = async (data: CreateUserInput, qr: QueryRunner) => {
-    const hash = await bcryptjs.hash(
+  registerWithEmail = async (
+    data: CreateUserInput,
+    queryRunner: QueryRunner,
+  ) => {
+    const hash = await bcrypt.hash(
       data.password,
-      this.configService.get<string>(ENV_HASH_ROUNDS_KEY),
+      parseInt(this.configService.get<string>(ENV_HASH_ROUNDS_KEY)),
     );
 
-    const newUser = await this.userRepository.createUser(
+    const user = await this.userRepository.createUser(
       {
         ...data,
+      },
+      queryRunner,
+    );
+
+    console.log(user);
+
+    await this.accountRepository.createAccount(
+      {
+        userId: user.id,
+        email: data.email,
+        providerTypeId: data.providerTypeId,
         password: hash,
       },
-      qr,
+      queryRunner,
     );
+
+    const newUser: LoginAuthDto = {
+      id: user.id,
+      email: data.email,
+      name: data.name,
+    };
 
     return this.loginUser(newUser);
   };
 
-  async loginUser(user: UserEntity) {
+  async loginUser(user: LoginAuthDto) {
     return {
       accessToken: this.tokenService.signToken(user, false),
       refreshToken: this.tokenService.signToken(user, true),

@@ -13,6 +13,7 @@ import {
   ENV_JWT_SECRET,
   ENV_REFRESH_TOKEN_EXPIRES_IN,
 } from '@lib/common';
+import { LoginAuthDto } from '../../../../apps/account/src/apis/auth/dto/login-auth.dto';
 
 @Injectable()
 export class TokenService {
@@ -22,7 +23,7 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
-  signToken(user: Pick<UserEntity, 'id' | 'name'>, isRefreshToken: boolean) {
+  signToken(user: LoginAuthDto, isRefreshToken: boolean) {
     const payload = {
       sub: user.id,
       nickname: user.name,

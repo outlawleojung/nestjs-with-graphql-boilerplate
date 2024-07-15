@@ -2,21 +2,19 @@ import { QueryRunner, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { BaseRepository } from './base.repository';
-import { AccountEntity, UserEntity } from '@lib/entity';
-import { AccountEntityRepository } from './account.repository';
+import { UserEntity } from '@lib/entity';
 import { CreateUserInput } from '../../../../apps/account/src/apis/auth/dto/create-user.input';
 
 export class UserEntityRepository extends BaseRepository<UserEntity> {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-    private accountRepository: AccountEntityRepository,
   ) {
     super(userRepository, UserEntity);
   }
 
-  async findById(id: string) {
-    return await this.repository.findOne({
+  async findById(id: string, queryRunner?: QueryRunner) {
+    return await this.getRepository(queryRunner).findOne({
       where: {
         id,
       },
@@ -102,6 +100,7 @@ export class UserEntityRepository extends BaseRepository<UserEntity> {
         accounts: {
           id: true,
           email: true,
+          password: true,
           providerType: {
             id: true,
             name: true,

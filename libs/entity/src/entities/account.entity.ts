@@ -14,10 +14,10 @@ import { BaseModelEntity } from '@lib/entity/entities/base-model.entity';
 @Unique(['user', 'providerType'])
 @Entity('account')
 export class AccountEntity extends BaseModelEntity {
-  @Column()
+  @Column({ nullable: false })
   userId: string;
 
-  @Column()
+  @Column({ nullable: false })
   providerTypeId: number;
 
   @Column()
@@ -30,13 +30,13 @@ export class AccountEntity extends BaseModelEntity {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @ManyToOne(() => ProviderTypeEntity, (type) => type.accounts, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'providerTypeId' })
+  @JoinColumn({ name: 'provider_type_id' })
   providerType: ProviderTypeEntity;
 }

@@ -33,7 +33,7 @@ type Query {
 
 type Mutation {
   createUser(createUserInput: CreateUserInput!): LoginOutput!
-  login(loginWithEmailPasswordInput: LoginWithEmailPasswordInput!): LoginOutput!
+  login(loginWithEmailInput: LoginWithEmailInput!): LoginOutput!
 }
 
 input CreateUserInput {
@@ -50,7 +50,7 @@ input CreateUserInput {
   providerTypeId: Int!
 }
 
-input LoginWithEmailPasswordInput {
+input LoginWithEmailInput {
   """Email"""
   email: String!
 

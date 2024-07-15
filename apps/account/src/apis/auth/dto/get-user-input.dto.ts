@@ -3,13 +3,16 @@ import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { AccountDto } from './account.dto';
 
 @ObjectType()
-export class UserDto {
+export class GetUserIntputDto {
   @Field(() => String)
   id: string;
 
   @Field()
   name: string;
 
-  @Field(() => [AccountDto])
-  accounts: AccountDto[];
+  @Field()
+  email: string;
+
+  @Field()
+  providerTypeId: number;
 }

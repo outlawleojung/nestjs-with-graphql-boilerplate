@@ -5,7 +5,6 @@ import {
   UserEntity,
   UserEntityRepository,
 } from '@lib/entity';
-import { UserDto } from './dto/user.dto';
 import { ProviderTypeDto } from './dto/provider-type.dto';
 import { AccountDto } from './dto/account.dto';
 import { CreateUserInput } from './dto/create-user.input';
@@ -33,7 +32,7 @@ export class AuthService {
     const user = await this.userRepository.findById(id);
     if (!user) return null;
 
-    return this.toUserDto(user);
+    return user;
   }
 
   async findByIdAndProviderType(id: string, providerTypeId: number) {
@@ -42,13 +41,20 @@ export class AuthService {
       providerTypeId,
     );
     if (!user) return null;
-    return this.toUserDto(user);
+    return user;
   }
 
   async loginWithEmail(input: LoginWithEmailInput, queryRunner: QueryRunner) {
     const exUser = await this.authenticateWithEmailAndPassword(input);
 
-    return this.loginUser(exUser);
+    const result: LoginOutput = await this.loginUser(exUser);
+    await this.userRepository.updateUser(
+      exUser.id,
+      { refreshToken: result.refreshToken },
+      queryRunner,
+    );
+
+    return result;
   }
 
   async validateUser(accessToken: string) {
@@ -127,24 +133,6 @@ export class AuthService {
     return {
       accessToken: this.tokenService.signToken(user, false),
       refreshToken: this.tokenService.signToken(user, true),
-    };
-  }
-
-  private toUserDto(user: UserEntity): UserDto {
-    return {
-      id: user.id,
-      name: user.name,
-      accounts: user.accounts.map(
-        (account) =>
-          ({
-            id: account.id,
-            email: account.email,
-            providerType: {
-              id: account.providerType.id,
-              name: account.providerType.name,
-            } as ProviderTypeDto,
-          }) as AccountDto,
-      ),
     };
   }
 }

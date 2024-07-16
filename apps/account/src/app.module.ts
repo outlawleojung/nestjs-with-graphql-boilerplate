@@ -6,6 +6,7 @@ import { AuthModule } from './apis/auth/auth.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
+import { UsersModule } from './apis/users/users.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { DevtoolsModule } from '@nestjs/devtools-integration';
       http: process.env.NODE_ENV !== 'production',
     }),
     AuthModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],

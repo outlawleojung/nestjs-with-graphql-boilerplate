@@ -1,7 +1,7 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 @ObjectType()
-export class ProviderType {
+export class ProviderTypeDto {
   @Field(() => Int)
   id: number;
 
@@ -10,18 +10,24 @@ export class ProviderType {
 }
 
 @ObjectType()
-export class Account {
+export class AccountDto {
   @Field()
   userId: string;
 
   @Field()
-  password: string;
+  providerTypeId: number;
+
+  @Field()
+  password?: string | null;
 
   @Field()
   email: string;
 
-  @Field(() => ProviderType)
-  providerType: ProviderType;
+  @Field(() => ProviderTypeDto)
+  providerType: ProviderTypeDto;
+
+  @Field()
+  createdAt: Date;
 }
 
 @ObjectType()
@@ -35,6 +41,9 @@ export class UserDto {
   @Field()
   refreshToken: string;
 
-  @Field(() => [Account])
-  accounts: Account[];
+  @Field()
+  createdAt: Date;
+
+  @Field(() => [AccountDto])
+  accounts?: AccountDto[];
 }

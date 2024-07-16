@@ -2,18 +2,18 @@ import { UserEntity, UserEntityRepository } from '@lib/entity';
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcryptjs from 'bcryptjs';
-import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import {
   ENV_ACCESS_TOKEN_EXPIRES_IN,
   ENV_JWT_SECRET,
   ENV_REFRESH_TOKEN_EXPIRES_IN,
+  LoginAuthDto,
 } from '@lib/common';
-import { LoginAuthDto } from '../../../../apps/account/src/apis/auth/dto/login-auth.dto';
 
 @Injectable()
 export class TokenService {
@@ -23,6 +23,8 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
+  private readonly logger = new Logger(TokenService.name);
+
   signToken(user: LoginAuthDto, isRefreshToken: boolean) {
     const payload = {
       sub: user.id,
@@ -30,11 +32,14 @@ export class TokenService {
       type: isRefreshToken ? 'refresh' : 'access',
     };
 
+    const secret = this.configService.get<string>(ENV_JWT_SECRET);
+    const expiresIn = isRefreshToken
+      ? this.configService.get<string>(ENV_REFRESH_TOKEN_EXPIRES_IN)
+      : this.configService.get<string>(ENV_ACCESS_TOKEN_EXPIRES_IN);
+
     return this.jwtService.sign(payload, {
-      secret: this.configService.get<string>(ENV_JWT_SECRET),
-      expiresIn: isRefreshToken
-        ? this.configService.get<string>(ENV_REFRESH_TOKEN_EXPIRES_IN)
-        : this.configService.get<string>(ENV_ACCESS_TOKEN_EXPIRES_IN),
+      secret,
+      expiresIn,
     });
   }
 
@@ -57,9 +62,7 @@ export class TokenService {
    */
   async rotateToken(token: string, isRefreshToken: boolean) {
     try {
-      const decoded = this.jwtService.verify(token, {
-        secret: this.configService.get<string>(ENV_JWT_SECRET),
-      });
+      const decoded = this.verifyToken(token);
 
       if (decoded.type !== 'refresh') {
         throw new UnauthorizedException(
@@ -68,8 +71,12 @@ export class TokenService {
       }
 
       // 데이터베이스에 있는 토큰과 비교
-      const user = await this.userRepository.findById(decoded.sub);
+      const user = await this.userRepository.findBySelectField({
+        id: decoded.sub,
+        selectedFields: ['refreshToken'],
+      });
 
+      console.log(user);
       const validToken = bcryptjs.compareSync(token, user.refreshToken);
       console.log('validToken: ', validToken);
 
@@ -94,12 +101,12 @@ export class TokenService {
    * @param token
    */
   async saveRefreshToken(token: string) {
-    const result = await this.verifyToken(token);
-
-    // 토큰 암호화 설정
-    const hashedRefreshToken = await bcryptjs.hash(token, 12);
-
     try {
+      const result = await this.verifyToken(token);
+
+      // 토큰 암호화 설정
+      const hashedRefreshToken = await bcryptjs.hash(token, 12);
+
       const user = new UserEntity();
       user.id = result.sub;
       user.refreshToken = hashedRefreshToken;

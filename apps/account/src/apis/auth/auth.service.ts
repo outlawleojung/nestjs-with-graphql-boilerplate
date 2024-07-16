@@ -1,21 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { UpdateAuthInput } from './dto/update-auth.input';
-import {
-  AccountEntityRepository,
-  UserEntity,
-  UserEntityRepository,
-} from '@lib/entity';
-import { ProviderTypeDto } from './dto/provider-type.dto';
-import { AccountDto } from './dto/account.dto';
+import { AccountEntityRepository, UserEntityRepository } from '@lib/entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { QueryRunner } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { LoginWithEmailInput } from './dto/login-with-email.input';
-import { ENV_HASH_ROUNDS_KEY, TokenService } from '@lib/common';
+import {
+  ENV_HASH_ROUNDS_KEY,
+  TokenService,
+  UserValidationService,
+  LoginWithEmailInput,
+  TokenUtilsService,
+  LoginAuthDto,
+} from '@lib/common';
 import { ConfigService } from '@nestjs/config';
-import { LoginAuthDto } from './dto/login-auth.dto';
-import { PROVIDER_TYPE } from '@lib/common/constants/constants';
 import { LoginOutput } from './dto/login.output';
+import { AccessTokenDto } from './dto/access-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -26,33 +24,20 @@ export class AuthService {
     private readonly accountRepository: AccountEntityRepository,
     private readonly configService: ConfigService,
     private readonly tokenService: TokenService,
+    private readonly tokenUtilsService: TokenUtilsService,
+    private readonly userValidationService: UserValidationService,
   ) {}
 
-  async findById(id: string) {
-    const user = await this.userRepository.findById(id);
-    if (!user) return null;
-
-    return user;
-  }
-
-  async findByIdAndProviderType(id: string, providerTypeId: number) {
-    const user = await this.userRepository.findByIdAndProviderType(
-      id,
-      providerTypeId,
-    );
-    if (!user) return null;
-    return user;
-  }
-
   async loginWithEmail(input: LoginWithEmailInput, queryRunner: QueryRunner) {
-    const exUser = await this.authenticateWithEmailAndPassword(input);
+    const exUser =
+      await this.userValidationService.authenticateWithEmailAndPassword(
+        input,
+        queryRunner,
+      );
 
     const result: LoginOutput = await this.loginUser(exUser);
-    await this.userRepository.updateUser(
-      exUser.id,
-      { refreshToken: result.refreshToken },
-      queryRunner,
-    );
+
+    await this.tokenService.saveRefreshToken(result.refreshToken);
 
     return result;
   }
@@ -66,30 +51,6 @@ export class AuthService {
 
       throw error;
     }
-  }
-
-  async authenticateWithEmailAndPassword(user: LoginWithEmailInput) {
-    const exUser = await this.userRepository.findByEmailAndProviderType(
-      user.email,
-      PROVIDER_TYPE.LOCAL,
-    );
-
-    if (!exUser) {
-      this.logger.error('사용자를 찾을 수 없음');
-      throw new Error('사용자를 찾을 수 없음');
-    }
-
-    const validPassword = bcrypt.compareSync(
-      user.password,
-      exUser.accounts[0].password,
-    );
-
-    if (!validPassword) {
-      this.logger.error('패스워드가 일치 하지 않음');
-      throw new Error('패스워드가 일치 하지 않음');
-    }
-
-    return { id: exUser.id, name: exUser.name, email: user.email };
   }
 
   registerWithEmail = async (
@@ -133,6 +94,18 @@ export class AuthService {
     return {
       accessToken: this.tokenService.signToken(user, false),
       refreshToken: this.tokenService.signToken(user, true),
+    };
+  }
+
+  async getAccessToken(rawToken: string): Promise<AccessTokenDto> {
+    const token = this.tokenUtilsService.extractTokenFromHeader(rawToken, true);
+    const newToken = await this.tokenService.rotateToken(token, false);
+
+    /**
+     * {accessToken: {token}}
+     */
+    return {
+      accessToken: newToken,
     };
   }
 }

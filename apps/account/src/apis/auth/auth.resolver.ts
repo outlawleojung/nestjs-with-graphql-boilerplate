@@ -1,32 +1,45 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  Info,
+  Context,
+} from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 
 import { CreateUserInput } from './dto/create-user.input';
-import { UseInterceptors } from '@nestjs/common';
-import { QueryRunner, TransactionInterceptor } from '@lib/common';
+import { UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  CommonService,
+  QueryRunner,
+  TransactionInterceptor,
+  LoginWithEmailInput,
+  RefreshTokenGuard,
+} from '@lib/common';
 import { QueryRunner as QR } from 'typeorm';
 import { LoginOutput } from './dto/login.output';
-import { LoginWithEmailInput } from './dto/login-with-email.input';
-
-import { UserDto } from './dto/get-user.dto';
-import { GetUserIntputDto } from './dto/get-user-input.dto';
+import { AccessTokenDto } from './dto/access-token.dto';
 
 @Resolver()
 export class AuthResolver {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly commonService: CommonService,
+  ) {}
 
-  @Query(() => GetUserIntputDto, { nullable: true })
-  async getUser(
-    @Args('id', { type: () => String, nullable: true }) id?: string,
-    @Args('providerTypeId', { type: () => Int, nullable: true })
-    providerTypeId?: number,
-  ): Promise<UserDto | null> {
-    // if (id && providerTypeId) {
-    //   return await this.authService.findByIdAndProviderType(id, providerTypeId);
-    // } else if (id) {
-    //   return await this.authService.findById(id);
-    // }
-    // return null;
+  @Query(() => String)
+  healthCheck(): string {
+    return 'OK';
+  }
+
+  @UseGuards(RefreshTokenGuard)
+  @Mutation(() => AccessTokenDto)
+  async postTokenAccess(@Context('req') req: any): Promise<AccessTokenDto> {
+    const rawToken = req.headers.authorization;
+    console.log('rawToken : ', rawToken);
+    return await this.authService.getAccessToken(rawToken);
   }
 
   @UseInterceptors(TransactionInterceptor)

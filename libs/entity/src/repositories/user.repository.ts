@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BaseRepository } from './base.repository';
 import { UserEntity } from '@lib/entity';
 import { CreateUserInput } from '../../../../apps/account/src/apis/auth/dto/create-user.input';
+import { GetUserParamsDto, UserDto } from '@lib/common';
+import { toUserDTO } from '@lib/entity/mapper';
 
 export class UserEntityRepository extends BaseRepository<UserEntity> {
   constructor(
@@ -11,6 +13,45 @@ export class UserEntityRepository extends BaseRepository<UserEntity> {
     private userRepository: Repository<UserEntity>,
   ) {
     super(userRepository, UserEntity);
+  }
+
+  async findBySelectField(
+    params: GetUserParamsDto,
+    qr?: QueryRunner,
+  ): Promise<UserDto> {
+    console.log(params.selectedFields);
+    const queryBuilder = this.getRepository(qr).createQueryBuilder('user');
+
+    // 조건에 따라 동적으로 쿼리 구성
+    if (params.id) {
+      queryBuilder.andWhere('user.id = :id', { id: params.id });
+    }
+    if (params.email) {
+      queryBuilder.andWhere('accounts.email = :email', { email: params.email });
+    }
+    if (params.name) {
+      queryBuilder.andWhere('user.name = :name', { name: params.name });
+    }
+
+    // 선택적 필드 조회
+    if (params.selectedFields.includes('accounts')) {
+      queryBuilder
+        .leftJoinAndSelect('user.accounts', 'accounts')
+        .leftJoinAndSelect('accounts.providerType', 'providerType');
+
+      if (params.providerTypeId) {
+        queryBuilder.andWhere('accounts.providerTypeId = :providerTypeId', {
+          providerTypeId: params.providerTypeId,
+        });
+      }
+    }
+
+    const userEntity = await queryBuilder.getOne();
+    if (!userEntity) {
+      return null;
+    }
+
+    return toUserDTO(userEntity);
   }
 
   async findById(id: string, queryRunner?: QueryRunner) {
@@ -22,6 +63,7 @@ export class UserEntityRepository extends BaseRepository<UserEntity> {
       select: {
         id: true,
         name: true,
+        refreshToken: true,
         accounts: {
           id: true,
           email: true,

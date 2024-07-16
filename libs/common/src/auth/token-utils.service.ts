@@ -1,6 +1,8 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
+import { TokenService } from '@lib/common/auth/token.service';
 
 export class TokenUtilsService {
+  private readonly logger = new Logger(TokenService.name);
   constructor() {}
 
   extractTokenFromHeader(header: string, isBearer: boolean) {

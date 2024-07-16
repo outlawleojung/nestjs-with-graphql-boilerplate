@@ -10,19 +10,28 @@ import {
   UserEntityRepository,
 } from '@lib/entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TokenService } from '@lib/common';
+import {
+  CommonModule,
+  CommonService,
+  TokenService,
+  TokenUtilsService,
+  UserValidationService,
+} from '@lib/common';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity, AccountEntity, ProviderTypeEntity]),
     EntityModule,
+    CommonModule,
   ],
   providers: [
     AuthResolver,
     AuthService,
     TokenService,
+    TokenUtilsService,
     UserEntityRepository,
     AccountEntityRepository,
+    UserValidationService,
   ],
 })
 export class AuthModule {}

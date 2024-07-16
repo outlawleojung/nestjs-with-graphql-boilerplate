@@ -10,6 +10,7 @@ export * from './dto/login-auth.dto';
 export * from './auth/token.service';
 export * from './auth/token-utils.service';
 export * from './auth/user-validation.service';
+export * from './middlewares/basic-auth-middlewre';
 
 export * from './guard/bearer-token.guard';
 export * from './guard/basic-token.guard';

@@ -1,7 +1,11 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { ENV_JWT_EXPIRES_IN, ENV_JWT_SECRET } from '@lib/common';
+import {
+  BasicAuthMiddleware,
+  ENV_JWT_EXPIRES_IN,
+  ENV_JWT_SECRET,
+} from '@lib/common';
 import { AuthModule } from './apis/auth/auth.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -25,6 +29,7 @@ import { UsersModule } from './apis/users/users.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'apps/account/src/commons/graphql/schema.gql',
+      playground: false,
     }),
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',
@@ -35,4 +40,10 @@ import { UsersModule } from './apis/users/users.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(BasicAuthMiddleware)
+      .forRoutes({ path: 'graphql-playground', method: RequestMethod.GET });
+  }
+}

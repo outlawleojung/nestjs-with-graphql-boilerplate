@@ -17,7 +17,7 @@ export class UsersResolver {
   async getUser(
     @Args('input') input: GetUserInputDto,
     @Info() info: GraphQLResolveInfo,
-  ): Promise<UserDto | null> {
+  ): Promise<Partial<UserDto | null>> {
     const selectedFields = this.commonService.getSelectedFields(info);
 
     return await this.usersService.getUser({ ...input, selectedFields });

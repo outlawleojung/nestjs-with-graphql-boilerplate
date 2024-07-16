@@ -4,6 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import { ENV_SERVER_PORT } from '@lib/common';
 import { Logger } from '@nestjs/common';
 import helmet from 'helmet';
+import { graphqlHTTP } from 'express-graphql';
+import { buildSchema } from 'graphql/utilities';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {

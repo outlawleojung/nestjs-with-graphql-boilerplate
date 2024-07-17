@@ -6,6 +6,7 @@ export * from './dto/get-user.dto';
 export * from './dto/get-user-params.dto';
 export * from './dto/login-with-email.input';
 export * from './dto/login-auth.dto';
+export * from './dto/register-with-email.input';
 
 export * from './auth/token.service';
 export * from './auth/token-utils.service';

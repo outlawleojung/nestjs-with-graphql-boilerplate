@@ -58,11 +58,11 @@ input GetUserInputDto {
 type Mutation {
   createTokenAccess: TokenResponseDto!
   createTokenRefresh: TokenResponseDto!
-  createUser(createUserInput: CreateUserInput!): LoginOutput!
+  registerWithEmail(input: RegisterWithEmailInput!): LoginOutput!
   loginWithEmail: LoginOutput!
 }
 
-input CreateUserInput {
+input RegisterWithEmailInput {
   """Email"""
   email: String!
 

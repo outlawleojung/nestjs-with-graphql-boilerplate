@@ -112,7 +112,7 @@ export class TokenService {
    * Refresh Token 데이터베이스에 저장
    * @param token
    */
-  async saveRefreshToken(token: string) {
+  async saveRefreshToken(token: string, queryRunner?: QueryRunner) {
     try {
       const result = await this.verifyToken(token);
 
@@ -123,7 +123,7 @@ export class TokenService {
       user.id = result.sub;
       user.refreshToken = hashedRefreshToken;
 
-      await this.userRepository.updateUser(user.id, user);
+      await this.userRepository.updateUser(user.id, user, queryRunner);
     } catch (e) {
       console.log(e.toString());
       throw new ForbiddenException('Refresh 토큰 DB 저장 실패');

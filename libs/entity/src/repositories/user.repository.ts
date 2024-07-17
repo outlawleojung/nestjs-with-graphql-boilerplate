@@ -1,16 +1,10 @@
 import { QueryRunner, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-
 import { BaseRepository } from './base.repository';
-import {
-  applyConditions,
-  applyJoinFields,
-  applySelectFields,
-  UserEntity,
-} from '@lib/entity';
-import { CreateUserInput } from '../../../../apps/account/src/apis/auth/dto/create-user.input';
-import { AccountDto, GetUserParamsDto, UserDto } from '@lib/common';
-import { toAccountDTO, toUserDTO } from '@lib/entity/mapper';
+import { UserEntity } from '@lib/entity';
+import { RegisterWithEmailInput } from '@lib/common';
+import { UserDto } from '@lib/common';
+import { toUserDTO } from '@lib/entity/mapper';
 
 export class UserEntityRepository extends BaseRepository<UserEntity> {
   constructor(
@@ -19,53 +13,6 @@ export class UserEntityRepository extends BaseRepository<UserEntity> {
   ) {
     super(userRepository, UserEntity);
   }
-
-  // async findBySelectField(
-  //    params: GetUserParamsDto,
-  //   qr?: QueryRunner,
-  // ): Promise<Partial<UserDto>> {
-  //   const queryBuilder = this.getRepository(qr).createQueryBuilder('user');
-  //
-  //   const conditionMappings = {
-  //     id: 'user.id = :id',
-  //     email: 'accounts.email = :email',
-  //     name: 'user.name = :name',
-  //     providerTypeId: 'accounts.providerTypeId = :providerTypeId',
-  //   };
-  //   applyConditions(queryBuilder, params, conditionMappings);
-  //
-  //   // 선택적 필드 적용
-  //   const fieldMappings = {
-  //     id: 'user.id',
-  //     name: 'user.name',
-  //     refreshToken: 'user.refreshToken',
-  //     createdAt: 'user.createdAt',
-  //     accounts: 'accounts.id, accounts.email, accounts.providerTypeId',
-  //     'accounts.providerType': 'providerType.id, providerType.name',
-  //   };
-  //   applySelectFields(
-  //     queryBuilder,
-  //     'user',
-  //     params.selectedFields,
-  //     fieldMappings,
-  //   );
-  //
-  //   // 조인 필드 적용
-  //   const joinMappings = {
-  //     accounts: 'user.accounts',
-  //     'accounts.providerType': 'accounts.providerType',
-  //   };
-  //   if (params.selectedFields.includes('accounts')) {
-  //     applyJoinFields(queryBuilder, joinMappings);
-  //   }
-  //
-  //   const userEntity = await queryBuilder.getOne();
-  //   if (!userEntity) {
-  //     return null;
-  //   }
-  //
-  //   return this.mapToDto(userEntity, params.selectedFields);
-  // }
 
   private readonly fieldMappings = {
     id: 'user.id',
@@ -201,7 +148,7 @@ export class UserEntityRepository extends BaseRepository<UserEntity> {
     });
   }
 
-  async createUser(data: CreateUserInput, qr: QueryRunner) {
+  async createUser(data: RegisterWithEmailInput, qr: QueryRunner) {
     const user = new UserEntity();
     user.name = data.name;
 

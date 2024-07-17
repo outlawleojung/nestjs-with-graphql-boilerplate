@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AccountEntityRepository, UserEntityRepository } from '@lib/entity';
-import { CreateUserInput } from './dto/create-user.input';
 import { QueryRunner } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import {
@@ -9,6 +8,7 @@ import {
   UserValidationService,
   TokenUtilsService,
   LoginAuthDto,
+  RegisterWithEmailInput,
 } from '@lib/common';
 import { ConfigService } from '@nestjs/config';
 import { LoginOutput } from './dto/login.output';
@@ -60,7 +60,7 @@ export class AuthService {
   }
 
   registerWithEmail = async (
-    data: CreateUserInput,
+    data: RegisterWithEmailInput,
     queryRunner: QueryRunner,
   ) => {
     const hash = await bcrypt.hash(
@@ -95,7 +95,7 @@ export class AuthService {
 
     const result: LoginOutput = await this.loginUser(newUser);
 
-    await this.tokenService.saveRefreshToken(result.refreshToken);
+    await this.tokenService.saveRefreshToken(result.refreshToken, queryRunner);
 
     return result;
   };

@@ -38,9 +38,9 @@ type LoginOutput {
   refreshToken: String
 }
 
-type AccessTokenDto {
-  """AccessToken"""
+type TokenResponseDto {
   accessToken: String!
+  refreshToken: String!
 }
 
 type Query {
@@ -56,7 +56,8 @@ input GetUserInputDto {
 }
 
 type Mutation {
-  createTokenAccess: AccessTokenDto!
+  createTokenAccess: TokenResponseDto!
+  createTokenRefresh: TokenResponseDto!
   createUser(createUserInput: CreateUserInput!): LoginOutput!
   loginWithEmail: LoginOutput!
 }

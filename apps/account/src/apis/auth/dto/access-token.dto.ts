@@ -1,7 +1,10 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, createUnionType } from '@nestjs/graphql';
 
 @ObjectType()
-export class AccessTokenDto {
-  @Field(() => String, { description: 'AccessToken' })
-  accessToken: string;
+export class TokenResponseDto {
+  @Field()
+  accessToken?: string;
+
+  @Field()
+  refreshToken?: string;
 }

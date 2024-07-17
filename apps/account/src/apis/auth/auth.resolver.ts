@@ -15,12 +15,11 @@ import {
   CommonService,
   QueryRunner,
   TransactionInterceptor,
-  LoginWithEmailInput,
   RefreshTokenGuard,
 } from '@lib/common';
 import { QueryRunner as QR } from 'typeorm';
 import { LoginOutput } from './dto/login.output';
-import { AccessTokenDto } from './dto/access-token.dto';
+import { TokenResponseDto } from './dto/access-token.dto';
 
 @Resolver()
 export class AuthResolver {
@@ -36,14 +35,36 @@ export class AuthResolver {
 
   @UseInterceptors(TransactionInterceptor)
   @UseGuards(RefreshTokenGuard)
-  @Mutation(() => AccessTokenDto)
+  @Mutation(() => TokenResponseDto)
   async createTokenAccess(
     @QueryRunner() queryRunner: QR,
     @Context('req') req: any,
-  ): Promise<AccessTokenDto> {
+  ): Promise<TokenResponseDto> {
     const rawToken = req.headers.authorization;
     console.log('rawToken : ', rawToken);
-    return await this.authService.getAccessToken(rawToken, queryRunner);
+    return await this.authService.generateToken(
+      rawToken,
+      true,
+      false,
+      queryRunner,
+    );
+  }
+
+  @UseInterceptors(TransactionInterceptor)
+  @UseGuards(RefreshTokenGuard)
+  @Mutation(() => TokenResponseDto)
+  async createTokenRefresh(
+    @QueryRunner() queryRunner: QR,
+    @Context('req') req: any,
+  ): Promise<TokenResponseDto> {
+    const rawToken = req.headers.authorization;
+    console.log('rawToken : ', rawToken);
+    return await this.authService.generateToken(
+      rawToken,
+      true,
+      true,
+      queryRunner,
+    );
   }
 
   @UseInterceptors(TransactionInterceptor)

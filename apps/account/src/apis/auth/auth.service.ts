@@ -7,13 +7,12 @@ import {
   ENV_HASH_ROUNDS_KEY,
   TokenService,
   UserValidationService,
-  LoginWithEmailInput,
   TokenUtilsService,
   LoginAuthDto,
 } from '@lib/common';
 import { ConfigService } from '@nestjs/config';
 import { LoginOutput } from './dto/login.output';
-import { AccessTokenDto } from './dto/access-token.dto';
+import { TokenResponseDto } from './dto/access-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -94,7 +93,11 @@ export class AuthService {
       name: data.name,
     };
 
-    return this.loginUser(newUser);
+    const result: LoginOutput = await this.loginUser(newUser);
+
+    await this.tokenService.saveRefreshToken(result.refreshToken);
+
+    return result;
   };
 
   async loginUser(user: LoginAuthDto): Promise<LoginOutput> {
@@ -104,22 +107,47 @@ export class AuthService {
     };
   }
 
-  async getAccessToken(
+  // async getAccessToken(
+  //   rawToken: string,
+  //   queryRunner: QueryRunner,
+  // ): Promise<AccessTokenDto> {
+  //   const token = this.tokenUtilsService.extractTokenFromHeader(rawToken, true);
+  //   const newToken = await this.tokenService.rotateToken(
+  //     token,
+  //     false,
+  //     queryRunner,
+  //   );
+  //
+  //   return {
+  //     accessToken: newToken,
+  //   };
+  // }
+
+  async generateToken(
     rawToken: string,
+    isBearer: boolean,
+    isRefresh: boolean,
     queryRunner: QueryRunner,
-  ): Promise<AccessTokenDto> {
-    const token = this.tokenUtilsService.extractTokenFromHeader(rawToken, true);
+  ): Promise<TokenResponseDto> {
+    const token = this.tokenUtilsService.extractTokenFromHeader(
+      rawToken,
+      isBearer,
+    );
     const newToken = await this.tokenService.rotateToken(
       token,
-      false,
+      isRefresh,
       queryRunner,
     );
 
-    /**
-     * {accessToken: {token}}
-     */
-    return {
-      accessToken: newToken,
-    };
+    if (isRefresh) {
+      await this.tokenService.saveRefreshToken(newToken);
+      return {
+        refreshToken: newToken,
+      };
+    } else {
+      return {
+        accessToken: newToken,
+      };
+    }
   }
 }

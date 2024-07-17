@@ -9,9 +9,12 @@ import {
 @Injectable()
 export abstract class BaseRepository<T> {
   protected repository: Repository<T>;
-  private entityClass: EntityTarget<T>;
+  private readonly entityClass: EntityTarget<T>;
 
-  constructor(repository: Repository<T>, entityClass: EntityTarget<T>) {
+  protected constructor(
+    repository: Repository<T>,
+    entityClass: EntityTarget<T>,
+  ) {
     this.repository = repository;
     this.entityClass = entityClass;
   }

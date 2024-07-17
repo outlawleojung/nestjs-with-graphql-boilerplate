@@ -7,6 +7,6 @@ export class UsersService {
   constructor(private readonly userRepository: UserEntityRepository) {}
 
   async getUser(params: GetUserParamsDto): Promise<Partial<UserDto>> {
-    return await this.userRepository.findBySelectField(params);
+    return await this.userRepository.findUserBySelectField(params);
   }
 }

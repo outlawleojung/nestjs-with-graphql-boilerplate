@@ -14,6 +14,8 @@ import {
   ENV_REFRESH_TOKEN_EXPIRES_IN,
   LoginAuthDto,
 } from '@lib/common';
+import { QueryRunner } from 'typeorm';
+import { PROVIDER_TYPE } from '@lib/common/constants/constants';
 
 @Injectable()
 export class TokenService {
@@ -60,7 +62,11 @@ export class TokenService {
    * @param isRefreshToken
    * @returns
    */
-  async rotateToken(token: string, isRefreshToken: boolean) {
+  async rotateToken(
+    token: string,
+    isRefreshToken: boolean,
+    queryRunner: QueryRunner,
+  ) {
     try {
       const decoded = this.verifyToken(token);
 
@@ -71,10 +77,16 @@ export class TokenService {
       }
 
       // 데이터베이스에 있는 토큰과 비교
-      const user = await this.userRepository.findBySelectField({
-        id: decoded.sub,
-        selectedFields: ['refreshToken'],
-      });
+      const user = await this.userRepository.findUserBySelectField(
+        {
+          // id: decoded.sub,
+          // selectedFields: ['refreshToken'],
+          selectedFields: ['id', 'name', 'refreshToken'],
+          id: decoded.sub,
+          providerTypeId: PROVIDER_TYPE.LOCAL,
+        },
+        queryRunner,
+      );
 
       console.log(user);
       const validToken = bcryptjs.compareSync(token, user.refreshToken);

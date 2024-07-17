@@ -8,6 +8,7 @@ type ProviderTypeDto {
 }
 
 type AccountDto {
+  id: Float!
   userId: String!
   providerTypeId: Float!
   password: String!
@@ -55,9 +56,9 @@ input GetUserInputDto {
 }
 
 type Mutation {
-  postTokenAccess: AccessTokenDto!
+  createTokenAccess: AccessTokenDto!
   createUser(createUserInput: CreateUserInput!): LoginOutput!
-  login(loginWithEmailInput: LoginWithEmailInput!): LoginOutput!
+  loginWithEmail: LoginOutput!
 }
 
 input CreateUserInput {
@@ -72,12 +73,4 @@ input CreateUserInput {
 
   """ProviderTypeId"""
   providerTypeId: Int!
-}
-
-input LoginWithEmailInput {
-  """Email"""
-  email: String!
-
-  """Password"""
-  password: String
 }

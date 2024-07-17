@@ -28,10 +28,17 @@ export class AuthService {
     private readonly userValidationService: UserValidationService,
   ) {}
 
-  async loginWithEmail(input: LoginWithEmailInput, queryRunner: QueryRunner) {
+  async loginWithEmail(rawToken: string, queryRunner: QueryRunner) {
+    const token = this.tokenUtilsService.extractTokenFromHeader(
+      rawToken,
+      false,
+    );
+
+    const credentials = this.tokenUtilsService.decodeBasicToken(token);
+
     const exUser =
       await this.userValidationService.authenticateWithEmailAndPassword(
-        input,
+        credentials,
         queryRunner,
       );
 
@@ -97,9 +104,16 @@ export class AuthService {
     };
   }
 
-  async getAccessToken(rawToken: string): Promise<AccessTokenDto> {
+  async getAccessToken(
+    rawToken: string,
+    queryRunner: QueryRunner,
+  ): Promise<AccessTokenDto> {
     const token = this.tokenUtilsService.extractTokenFromHeader(rawToken, true);
-    const newToken = await this.tokenService.rotateToken(token, false);
+    const newToken = await this.tokenService.rotateToken(
+      token,
+      false,
+      queryRunner,
+    );
 
     /**
      * {accessToken: {token}}

@@ -12,6 +12,9 @@ export class ProviderTypeDto {
 @ObjectType()
 export class AccountDto {
   @Field()
+  id: number;
+
+  @Field()
   userId: string;
 
   @Field()

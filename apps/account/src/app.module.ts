@@ -29,7 +29,8 @@ import { UsersModule } from './apis/users/users.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'apps/account/src/commons/graphql/schema.gql',
-      playground: false,
+      playground: true, // playground를 활성화
+      path: '/graphql', // 새로운 URL 경로
     }),
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',

@@ -15,11 +15,12 @@ export class UserValidationService {
     user: LoginWithEmailInput,
     queryRunner?: QueryRunner,
   ) {
-    this.logger.debug('authenticateWithEmailAndPassword');
-    console.log(this.userRepository);
-    const exUser = await this.userRepository.findByEmailAndProviderType(
-      user.email,
-      PROVIDER_TYPE.LOCAL,
+    const exUser = await this.userRepository.findUserBySelectField(
+      {
+        selectedFields: ['id', 'name', 'accounts.password'],
+        email: user.email,
+        providerTypeId: PROVIDER_TYPE.LOCAL,
+      },
       queryRunner,
     );
 

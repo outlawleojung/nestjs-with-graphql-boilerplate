@@ -34,12 +34,16 @@ export class AuthResolver {
     return 'OK';
   }
 
+  @UseInterceptors(TransactionInterceptor)
   @UseGuards(RefreshTokenGuard)
   @Mutation(() => AccessTokenDto)
-  async postTokenAccess(@Context('req') req: any): Promise<AccessTokenDto> {
+  async createTokenAccess(
+    @QueryRunner() queryRunner: QR,
+    @Context('req') req: any,
+  ): Promise<AccessTokenDto> {
     const rawToken = req.headers.authorization;
     console.log('rawToken : ', rawToken);
-    return await this.authService.getAccessToken(rawToken);
+    return await this.authService.getAccessToken(rawToken, queryRunner);
   }
 
   @UseInterceptors(TransactionInterceptor)
@@ -53,11 +57,8 @@ export class AuthResolver {
 
   @UseInterceptors(TransactionInterceptor)
   @Mutation(() => LoginOutput)
-  login(
-    @QueryRunner() queryRunner: QR,
-    @Args('loginWithEmailInput')
-    input: LoginWithEmailInput,
-  ) {
-    return this.authService.loginWithEmail(input, queryRunner);
+  loginWithEmail(@QueryRunner() queryRunner: QR, @Context('req') req: any) {
+    const rawToken = req.headers.authorization;
+    return this.authService.loginWithEmail(rawToken, queryRunner);
   }
 }

@@ -26,6 +26,9 @@ export class AccountDto {
   @Field()
   email: string;
 
+  @Field()
+  socialToken?: string;
+
   @Field(() => ProviderTypeDto)
   providerType: ProviderTypeDto;
 

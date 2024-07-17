@@ -45,6 +45,10 @@ export const toAccountDTO = (
     partialAccountDto.providerTypeId = entity.providerTypeId;
   }
 
+  if (selectedFields.includes('accounts.socialToken')) {
+    partialAccountDto.socialToken = entity.socialToken;
+  }
+
   const providerTypeFields = selectedFields.filter((field) =>
     field.startsWith('accounts.providerType.'),
   );

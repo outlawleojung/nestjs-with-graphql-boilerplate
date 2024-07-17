@@ -1,15 +1,9 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryColumn,
-  Unique,
-} from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { ProviderTypeEntity } from './provider-type.entity';
 import { BaseModelEntity } from '@lib/entity/entities/base-model.entity';
 
+@Index(['socialToken'])
 @Unique(['email'])
 @Unique(['user', 'providerType'])
 @Entity('account')
@@ -24,7 +18,10 @@ export class AccountEntity extends BaseModelEntity {
   email: string;
 
   @Column({ nullable: true })
-  password: string | null;
+  password?: string | null;
+
+  @Column({ nullable: true })
+  socialToken?: string | null;
 
   @ManyToOne(() => UserEntity, (user) => user.accounts, {
     onDelete: 'CASCADE',

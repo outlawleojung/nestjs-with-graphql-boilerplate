@@ -59,6 +59,8 @@ export abstract class BaseRepository<T> {
         uniqueJoins.add(joinMappings[parts[0]]);
       }
     });
+
+    console.log(uniqueJoins);
     uniqueJoins.forEach((join) => {
       const alias = join.split('.').pop();
       queryBuilder.leftJoin(join, alias);

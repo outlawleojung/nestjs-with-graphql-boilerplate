@@ -13,6 +13,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { LoginOutput } from './dto/login.output';
 import { TokenResponseDto } from './dto/access-token.dto';
+import { CheckUserRegisterInput } from './dto/check-user-register.input';
+import { PROVIDER_TYPE } from '@lib/common/constants/constants';
 
 @Injectable()
 export class AuthService {
@@ -107,22 +109,14 @@ export class AuthService {
     };
   }
 
-  // async getAccessToken(
-  //   rawToken: string,
-  //   queryRunner: QueryRunner,
-  // ): Promise<AccessTokenDto> {
-  //   const token = this.tokenUtilsService.extractTokenFromHeader(rawToken, true);
-  //   const newToken = await this.tokenService.rotateToken(
-  //     token,
-  //     false,
-  //     queryRunner,
-  //   );
-  //
-  //   return {
-  //     accessToken: newToken,
-  //   };
-  // }
-
+  async checkUserRegister(dto: CheckUserRegisterInput) {
+    const exUser = await this.userRepository.findUserBySelectField({
+      selectedFields: ['id', 'accounts.socialToken'],
+      socialToken: dto.socialToken,
+      providerTypeId: dto.providerTypeId,
+    });
+    return !!exUser;
+  }
   async generateToken(
     rawToken: string,
     isBearer: boolean,

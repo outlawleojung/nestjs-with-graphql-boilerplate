@@ -13,6 +13,7 @@ type AccountDto {
   providerTypeId: Float!
   password: String!
   email: String!
+  socialToken: String!
   providerType: ProviderTypeDto!
   createdAt: DateTime!
 }
@@ -45,7 +46,13 @@ type TokenResponseDto {
 
 type Query {
   healthCheck: String!
+  checkUserRegister(dto: CheckUserRegisterInput!): Boolean!
   getUser(input: GetUserInputDto!): UserDto
+}
+
+input CheckUserRegisterInput {
+  socialToken: String!
+  providerTypeId: Int!
 }
 
 input GetUserInputDto {

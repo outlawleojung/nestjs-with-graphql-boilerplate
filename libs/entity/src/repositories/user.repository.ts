@@ -21,6 +21,7 @@ export class UserEntityRepository extends BaseRepository<UserEntity> {
     createdAt: 'user.createdAt',
     email: 'accounts.email',
     password: 'accounts.password',
+    socialToken: 'accounts.socialToken',
     'accounts.id': 'accounts.id',
     'accounts.email': 'accounts.email',
     'accounts.providerTypeId': 'accounts.providerTypeId',
@@ -34,6 +35,7 @@ export class UserEntityRepository extends BaseRepository<UserEntity> {
   private readonly joinMappings = {
     accounts: 'user.accounts',
     'accounts.providerType': 'accounts.providerType',
+    'accounts.socialToken': 'accounts.socialToken',
   };
 
   async findUserBySelectField(

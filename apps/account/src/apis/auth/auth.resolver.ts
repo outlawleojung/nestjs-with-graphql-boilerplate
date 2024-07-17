@@ -12,6 +12,8 @@ import {
 import { QueryRunner as QR } from 'typeorm';
 import { LoginOutput } from './dto/login.output';
 import { TokenResponseDto } from './dto/access-token.dto';
+import { isBoolean } from 'class-validator';
+import { CheckUserRegisterInput } from './dto/check-user-register.input';
 
 @Resolver()
 export class AuthResolver {
@@ -73,5 +75,10 @@ export class AuthResolver {
   loginWithEmail(@QueryRunner() queryRunner: QR, @Context('req') req: Request) {
     const rawToken = req.headers.authorization;
     return this.authService.loginWithEmail(rawToken, queryRunner);
+  }
+
+  @Query(() => Boolean)
+  checkUserRegister(@Args('dto') dto: CheckUserRegisterInput) {
+    return this.authService.checkUserRegister(dto);
   }
 }

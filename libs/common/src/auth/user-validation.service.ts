@@ -19,8 +19,8 @@ export class UserValidationService {
     const exUser = await this.userRepository.findUserBySelectField(
       {
         selectedFields: ['id', 'name', 'accounts.password'],
-        email: user.email,
-        providerTypeId: PROVIDER_TYPE.LOCAL,
+        'accounts.email': user.email,
+        'accounts.providerTypeId': PROVIDER_TYPE.LOCAL,
       },
       queryRunner,
     );

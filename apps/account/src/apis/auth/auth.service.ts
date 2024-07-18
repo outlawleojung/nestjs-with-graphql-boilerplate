@@ -53,6 +53,8 @@ export class AuthService {
 
     const credentials = this.tokenUtilsService.decodeBasicToken(token);
 
+    console.log(credentials);
+
     const exUser =
       await this.userValidationService.authenticateWithEmailAndPassword(
         credentials,

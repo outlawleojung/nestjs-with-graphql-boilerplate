@@ -70,6 +70,7 @@ type Mutation {
   loginWithEmail: TokenOutput!
   registerWithSocial(input: RegisterWithSocialInput!): TokenOutput!
   loginWithSocial(input: LoginWithSocialInput!): TokenOutput!
+  updateUser(input: UpdateUserInput!): UserDto
 }
 
 input RegisterWithEmailInput {
@@ -103,4 +104,8 @@ input LoginWithSocialInput {
 
   """ProviderTypeId"""
   providerTypeId: Int!
+}
+
+input UpdateUserInput {
+  name: String
 }

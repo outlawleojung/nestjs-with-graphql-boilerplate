@@ -75,8 +75,10 @@ export abstract class BaseRepository<T> {
     params: any,
     fieldMappings: { [key: string]: string },
   ) {
+    console.log('applyConditions: ', params);
     Object.keys(params).forEach((key) => {
       if (params[key] !== undefined && fieldMappings[key]) {
+        console.log('applyConditions: ', params[key]);
         queryBuilder.andWhere(`${fieldMappings[key]} = :${key}`, {
           [key]: params[key],
         });

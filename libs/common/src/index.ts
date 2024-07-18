@@ -8,6 +8,8 @@ export * from './dto/login-with-email.input';
 export * from './dto/login-auth.dto';
 export * from './dto/register-with-email.input';
 
+export * from './interfaces/social-user.interface';
+
 export * from './auth/token.service';
 export * from './auth/token-utils.service';
 export * from './auth/user-validation.service';

@@ -18,6 +18,7 @@ export class AccountEntityRepository extends BaseRepository<AccountEntity> {
       email: string;
       providerTypeId: number;
       password?: string;
+      socialToken?: string;
     },
     queryRunner: QueryRunner,
   ) {
@@ -26,6 +27,7 @@ export class AccountEntityRepository extends BaseRepository<AccountEntity> {
     account.password = data.password;
     account.email = data.email;
     account.providerTypeId = data.providerTypeId;
+    account.socialToken = data.socialToken;
 
     return await this.getRepository(queryRunner).save(account);
   }

@@ -4,6 +4,7 @@ import { LoginWithEmailInput } from '@lib/common';
 import { PROVIDER_TYPE } from '@lib/common/constants/constants';
 import * as bcrypt from 'bcrypt';
 import { QueryRunner } from 'typeorm';
+import { LoginWithSocialInput } from '@lib/common/dto/login-with-social.input';
 
 @Injectable()
 export class UserValidationService {
@@ -39,6 +40,44 @@ export class UserValidationService {
       throw new Error('패스워드가 일치 하지 않음');
     }
 
-    return { id: exUser.id, name: exUser.name, email: user.email };
+    return {
+      id: exUser.id,
+      name: exUser.name,
+      email: user.email,
+      providerTypeId: PROVIDER_TYPE.LOCAL,
+    };
+  }
+
+  async authenticateWithSocialToken(
+    socialToken: string,
+    providerTypeId: number,
+    queryRunner?: QueryRunner,
+  ) {
+    const exUser = await this.userRepository.findUserBySelectField(
+      {
+        selectedFields: [
+          'id',
+          'name',
+          'accounts.providerTypeId',
+          'accounts.email',
+          'accounts.socialToken',
+        ],
+        socialToken: socialToken,
+        providerTypeId: providerTypeId,
+      },
+      queryRunner,
+    );
+
+    if (!exUser) {
+      this.logger.error('사용자를 찾을 수 없음');
+      throw new Error('사용자를 찾을 수 없음');
+    }
+
+    return {
+      id: exUser.id,
+      name: exUser.name,
+      email: exUser.accounts[0].email,
+      providerTypeId: exUser.accounts[0].providerTypeId,
+    };
   }
 }

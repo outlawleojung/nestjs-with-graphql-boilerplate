@@ -4,6 +4,7 @@ import { ProviderTypeEntity } from './provider-type.entity';
 import { BaseModelEntity } from '@lib/entity/entities/base-model.entity';
 
 @Index(['socialToken'])
+@Unique(['socialToken'])
 @Unique(['email'])
 @Unique(['user', 'providerType'])
 @Entity('account')

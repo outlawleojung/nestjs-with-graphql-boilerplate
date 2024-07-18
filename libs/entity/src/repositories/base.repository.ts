@@ -30,6 +30,8 @@ export abstract class BaseRepository<T> {
     selectedFields: string[],
     fieldMappings: { [key: string]: string },
   ) {
+    console.log('selectedFields: ', selectedFields);
+
     const uniqueFields = new Set<string>();
     selectedFields.forEach((field) => {
       if (fieldMappings[field]) {
@@ -39,6 +41,7 @@ export abstract class BaseRepository<T> {
       }
     });
 
+    console.log('uniqueFields: ', uniqueFields);
     // 선택된 필드만 추가
     uniqueFields.forEach((field) => {
       const alias = this.toSnakeCase(field.replace(/\./g, '_'));
@@ -92,6 +95,7 @@ export abstract class BaseRepository<T> {
     const queryBuilder = this.getRepository(qr).createQueryBuilder(alias);
 
     this.applyConditions(queryBuilder, params, fieldMappings);
+
     // 선택적 필드 및 조인 적용
     const selectedFields = Array.isArray(params.selectedFields)
       ? params.selectedFields

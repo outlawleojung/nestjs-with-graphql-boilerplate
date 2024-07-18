@@ -20,13 +20,13 @@ export class AccountDto {
   @Field()
   providerTypeId: number;
 
-  @Field()
+  @Field({ nullable: true })
   password?: string | null;
 
   @Field()
   email: string;
 
-  @Field()
+  @Field({ nullable: true })
   socialToken?: string;
 
   @Field(() => ProviderTypeDto)
@@ -44,11 +44,14 @@ export class UserDto {
   @Field()
   name: string;
 
-  @Field()
+  @Field({ nullable: true })
   refreshToken: string;
 
   @Field()
   createdAt: Date;
+
+  @Field({ nullable: true })
+  profileImg: string;
 
   @Field(() => [AccountDto])
   accounts?: AccountDto[];

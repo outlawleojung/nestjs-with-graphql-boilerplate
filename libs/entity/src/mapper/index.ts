@@ -32,7 +32,7 @@ export const toAccountDTO = (
   if (selectedFields.includes('accounts.userId')) {
     partialAccountDto.userId = entity.userId;
   }
-  if (selectedFields.includes('accounts.password')) {
+  if (selectedFields.includes('accounts.password') && entity.password) {
     partialAccountDto.password = entity.password;
   }
   if (selectedFields.includes('accounts.email')) {
@@ -45,7 +45,7 @@ export const toAccountDTO = (
     partialAccountDto.providerTypeId = entity.providerTypeId;
   }
 
-  if (selectedFields.includes('accounts.socialToken')) {
+  if (selectedFields.includes('accounts.socialToken') && entity.socialToken) {
     partialAccountDto.socialToken = entity.socialToken;
   }
 
@@ -86,9 +86,9 @@ export const toUserDTO = (
     field.startsWith('accounts.'),
   );
   if (accountFields.length > 0) {
-    userDto.accounts = entity.accounts.map((account) =>
-      toAccountDTO(account, accountFields),
-    );
+    userDto.accounts = entity.accounts.map((account) => {
+      return toAccountDTO(account, accountFields);
+    });
   }
   console.log('userDto : ', userDto as UserDto);
   return userDto as UserDto;

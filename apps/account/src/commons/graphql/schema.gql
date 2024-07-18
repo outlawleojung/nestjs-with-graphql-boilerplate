@@ -11,9 +11,9 @@ type AccountDto {
   id: Float!
   userId: String!
   providerTypeId: Float!
-  password: String!
+  password: String
   email: String!
-  socialToken: String!
+  socialToken: String
   providerType: ProviderTypeDto!
   createdAt: DateTime!
 }
@@ -26,12 +26,13 @@ scalar DateTime
 type UserDto {
   id: String!
   name: String!
-  refreshToken: String!
+  refreshToken: String
   createdAt: DateTime!
+  profileImg: String
   accounts: [AccountDto!]!
 }
 
-type LoginOutput {
+type TokenOutput {
   """AccessToken"""
   accessToken: String!
 
@@ -46,12 +47,12 @@ type TokenResponseDto {
 
 type Query {
   healthCheck: String!
-  checkUserRegister(dto: CheckUserRegisterInput!): Boolean!
+  checkUserRegister(input: CheckUserRegisterInput!): Boolean!
   getUser(input: GetUserInputDto!): UserDto
 }
 
 input CheckUserRegisterInput {
-  socialToken: String!
+  idToken: String!
   providerTypeId: Int!
 }
 
@@ -65,8 +66,10 @@ input GetUserInputDto {
 type Mutation {
   createTokenAccess: TokenResponseDto!
   createTokenRefresh: TokenResponseDto!
-  registerWithEmail(input: RegisterWithEmailInput!): LoginOutput!
-  loginWithEmail: LoginOutput!
+  registerWithEmail(input: RegisterWithEmailInput!): TokenOutput!
+  loginWithEmail: TokenOutput!
+  registerWithSocial(input: RegisterWithSocialInput!): TokenOutput!
+  loginWithSocial(input: LoginWithSocialInput!): TokenOutput!
 }
 
 input RegisterWithEmailInput {
@@ -78,6 +81,25 @@ input RegisterWithEmailInput {
 
   """Name"""
   name: String!
+
+  """ProviderTypeId"""
+  providerTypeId: Int!
+}
+
+input RegisterWithSocialInput {
+  """idToken"""
+  idToken: String!
+
+  """ProviderTypeId"""
+  providerTypeId: Int!
+
+  """Name"""
+  name: String!
+}
+
+input LoginWithSocialInput {
+  """idToken"""
+  idToken: String!
 
   """ProviderTypeId"""
   providerTypeId: Int!

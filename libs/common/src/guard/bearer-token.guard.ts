@@ -36,7 +36,12 @@ export class BearerTokenGuard implements CanActivate {
 
     req.token = token;
     req.tokenType = result.type;
-    req.user = await this.userRepository.findByEmail(result.email);
+    // req.user = await this.userRepository.findByEmail(result.email);
+
+    req.user = await this.userRepository.findUserBySelectField({
+      selectedFields: ['id', 'accounts.email', 'name'],
+      id: result.sub,
+    });
 
     return true;
   }

@@ -51,52 +51,6 @@ export class UserEntityRepository extends BaseRepository<UserEntity> {
     );
   }
 
-  async findById(id: string, queryRunner?: QueryRunner) {
-    return await this.getRepository(queryRunner).findOne({
-      where: {
-        id,
-      },
-      relations: ['accounts', 'accounts.providerType'],
-      select: {
-        id: true,
-        name: true,
-        refreshToken: true,
-        accounts: {
-          id: true,
-          email: true,
-          providerType: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
-  }
-
-  async findByIdAndProviderType(id: string, providerTypeId: number) {
-    return await this.repository.findOne({
-      where: {
-        id,
-        accounts: {
-          providerTypeId,
-        },
-      },
-      relations: ['accounts', 'accounts.providerType'],
-      select: {
-        id: true,
-        name: true,
-        accounts: {
-          id: true,
-          email: true,
-          providerType: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
-  }
-
   async findByEmail(email: string) {
     return await this.repository.findOne({
       where: {
@@ -150,6 +104,7 @@ export class UserEntityRepository extends BaseRepository<UserEntity> {
   }
 
   async createWithEmail(data: RegisterWithEmailInput, qr: QueryRunner) {
+    console.log('createEmail: ', data);
     const user = new UserEntity();
     user.name = data.name;
 

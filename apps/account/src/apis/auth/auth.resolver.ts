@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { Request } from 'express';
-import { UseGuards, UseInterceptors } from '@nestjs/common';
+import { Logger, UseGuards, UseInterceptors } from '@nestjs/common';
 import {
   CommonService,
   QueryRunner,
@@ -16,6 +16,7 @@ import { isBoolean } from 'class-validator';
 import { CheckUserRegisterInput } from './dto/check-user-register.input';
 import { LoginWithSocialInput } from '@lib/common/dto/login-with-social.input';
 import { RegisterWithSocialInput } from '@lib/common/dto/register-with-social.input';
+import { MorganInterceptor } from 'nest-morgan';
 
 @Resolver()
 export class AuthResolver {
@@ -23,9 +24,10 @@ export class AuthResolver {
     private readonly authService: AuthService,
     private readonly commonService: CommonService,
   ) {}
-
+  private readonly logger = new Logger(AuthResolver.name);
   @Query(() => String)
   healthCheck(): string {
+    this.logger.log('-----------------healthCheck---------------');
     return 'OK';
   }
 
@@ -65,21 +67,21 @@ export class AuthResolver {
 
   @UseInterceptors(TransactionInterceptor)
   @Mutation(() => TokenOutput)
-  registerWithEmail(
+  async registerWithEmail(
     @QueryRunner() queryRunner: QR,
     @Args('input') input: RegisterWithEmailInput,
   ): Promise<TokenOutput> {
-    return this.authService.registerWithEmail(input, queryRunner);
+    return await this.authService.registerWithEmail(input, queryRunner);
   }
 
   @UseInterceptors(TransactionInterceptor)
   @Mutation(() => TokenOutput)
-  loginWithEmail(
+  async loginWithEmail(
     @QueryRunner() queryRunner: QR,
     @Context('req') req: Request,
   ): Promise<TokenOutput> {
     const rawToken = req.headers.authorization;
-    return this.authService.loginWithEmail(rawToken, queryRunner);
+    return await this.authService.loginWithEmail(rawToken, queryRunner);
   }
 
   @Query(() => Boolean)

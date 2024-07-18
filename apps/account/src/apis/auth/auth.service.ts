@@ -100,6 +100,8 @@ export class AuthService {
       queryRunner,
     );
 
+    console.log('--------------- register with email create user ------------');
+
     await this.accountRepository.createAccount(
       {
         userId: user.id,
@@ -108,6 +110,10 @@ export class AuthService {
         password: hash,
       },
       queryRunner,
+    );
+
+    console.log(
+      '--------------- register with email create account ------------',
     );
 
     const newUser: LoginAuthDto = {

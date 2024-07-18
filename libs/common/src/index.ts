@@ -22,3 +22,5 @@ export * from './interceptors/transaction.interceptor';
 export * from './decorators/query-runner.decorator';
 
 export * from './decorators/user.decorator';
+
+export * from './utils/custom-logger';

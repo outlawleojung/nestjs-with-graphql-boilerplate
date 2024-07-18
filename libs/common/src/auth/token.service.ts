@@ -79,8 +79,6 @@ export class TokenService {
       // 데이터베이스에 있는 토큰과 비교
       const user = await this.userRepository.findUserBySelectField(
         {
-          // id: decoded.sub,
-          // selectedFields: ['refreshToken'],
           selectedFields: ['id', 'name', 'refreshToken'],
           id: decoded.sub,
           providerTypeId: PROVIDER_TYPE.LOCAL,
@@ -133,7 +131,10 @@ export class TokenService {
   async validRefreshToken(token: string) {
     const result = this.verifyToken(token);
 
-    const user = await this.userRepository.findById(result.sub);
+    const user = await this.userRepository.findUserBySelectField({
+      selectedFields: ['id', 'refreshToken'],
+      id: result.sub,
+    });
 
     const validToken = bcryptjs.compareSync(token, user.refreshToken);
 

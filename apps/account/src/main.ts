@@ -32,6 +32,17 @@ async function bootstrap() {
     }),
   );
 
+  // app.useGlobalPipes(
+  //   new ValidationPipe({
+  //     whitelist: true,
+  //     forbidNonWhitelisted: true,
+  //     transform: true,
+  //     transformOptions: {
+  //       enableImplicitConversion: true,
+  //     },
+  //   }),
+  // );
+
   const configService = app.get(ConfigService);
   const port = configService.get<number>(ENV_SERVER_PORT) || 3100;
 

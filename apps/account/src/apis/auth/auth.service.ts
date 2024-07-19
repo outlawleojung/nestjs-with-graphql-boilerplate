@@ -63,7 +63,7 @@ export class AuthService {
 
     const result: TokenOutput = await this.loginUser(exUser);
 
-    await this.tokenService.saveRefreshToken(result.refreshToken);
+    await this.tokenService.saveRefreshToken(result.refreshToken, queryRunner);
 
     return result;
   }
@@ -100,8 +100,6 @@ export class AuthService {
       queryRunner,
     );
 
-    console.log('--------------- register with email create user ------------');
-
     await this.accountRepository.createAccount(
       {
         userId: user.id,
@@ -110,10 +108,6 @@ export class AuthService {
         password: hash,
       },
       queryRunner,
-    );
-
-    console.log(
-      '--------------- register with email create account ------------',
     );
 
     const newUser: LoginAuthDto = {
@@ -183,7 +177,7 @@ export class AuthService {
     );
 
     if (isRefresh) {
-      await this.tokenService.saveRefreshToken(newToken);
+      await this.tokenService.saveRefreshToken(newToken, queryRunner);
       return {
         refreshToken: newToken,
       };
@@ -258,7 +252,7 @@ export class AuthService {
 
     const result: TokenOutput = await this.loginUser(exUser);
 
-    await this.tokenService.saveRefreshToken(result.refreshToken);
+    await this.tokenService.saveRefreshToken(result.refreshToken, queryRunner);
 
     return result;
   }
@@ -286,6 +280,7 @@ export class AuthService {
         profileImg: payload.picture,
       };
     } catch (error) {
+      console.log(error);
       throw new UnauthorizedException('Invalid Google token');
     }
   }

@@ -1,5 +1,5 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 @InputType()
 export class RegisterWithEmailInput {
@@ -15,7 +15,7 @@ export class RegisterWithEmailInput {
   @Field(() => String, { description: 'Name' })
   name: string;
 
-  @IsString()
+  @IsNumber()
   @Field(() => Int, { description: 'ProviderTypeId' })
   providerTypeId: number;
 }
